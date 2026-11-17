@@ -1,0 +1,43 @@
+[
+  {
+    "order_id": "HK-2026-1001",
+    "customer_email": "alex.chan@example.com",
+    "purchase_date": "2026-10-22",
+    "delivery_date": "2026-10-25",
+    "item_name": "LAGKAPTEN / ALEX desk",
+    "total_hkd": 1299,
+    "status": "Delivered",
+    "previous_claims": 0
+  },
+  {
+    "order_id": "HK-2026-1002",
+    "customer_email": "jamie.wong@example.com",
+    "purchase_date": "2026-09-10",
+    "delivery_date": "2026-09-18",
+    "item_name": "KIVIK three-seat sofa",
+    "total_hkd": 4599,
+    "status": "Delivered",
+    "previous_claims": 0
+  },
+  {
+    "order_id": "HK-2026-1003",
+    "customer_email": "sam.lee@example.com",
+    "purchase_date": "2026-11-02",
+    "delivery_date": "2026-11-05",
+    "item_name": "HEKTAR floor lamp",
+    "total_hkd": 699,
+    "status": "Delivered",
+    "previous_claims": 1
+  },
+  {
+    "order_id": "HK-2026-1004",
+    "customer_email": "taylor.lam@example.com",
+    "purchase_date": "2025-06-01",
+    "delivery_date": "2025-06-05",
+    "item_name": "BILLY bookcase",
+    "total_hkd": 799,
+    "status": "Delivered",
+    "previous_claims": 2
+  }
+]
+
