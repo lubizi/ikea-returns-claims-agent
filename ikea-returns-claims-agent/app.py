@@ -24,9 +24,6 @@ st.markdown(
             border-radius: 14px; margin-bottom: 1rem; }
     .hero h1 { color: white; margin: 0; font-size: 2rem; }
     .hero p { margin: .45rem 0 0; opacity: .92; }
-    .prototype { display: inline-block; background: var(--ikea-yellow); color: #111;
-                 padding: .2rem .65rem; border-radius: 999px; font-weight: 700;
-                 margin-top: .7rem; }
     .result-card { background: white; border-left: 7px solid var(--ikea-blue);
                    border-radius: 10px; padding: 1rem 1.2rem; }
     .small-note { color: #5c6470; font-size: .85rem; }
@@ -42,7 +39,6 @@ st.markdown(
     <div class="hero">
       <h1>Returns & Claims AI Agent</h1>
       <p>First-line intake, policy checks, risk guardrails and staff routing in one workflow.</p>
-      <span class="prototype">Classroom prototype — not affiliated with IKEA</span>
     </div>
     """,
     unsafe_allow_html=True,
