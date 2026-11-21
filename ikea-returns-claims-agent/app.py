@@ -85,7 +85,7 @@ with tab_claim:
             email = st.text_input("Purchasing email", key="email")
             issue_type = st.selectbox(
                 "Issue type",
-                [item.value for item in IssueType],
+                ["Return / changed mind", "Damaged item", "Missing part", "Wrong item", "Refund delay"],
                 key="issue",
             )
         with col2:
