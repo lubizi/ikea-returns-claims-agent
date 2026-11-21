@@ -151,28 +151,21 @@ with tab_chat:
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Container for messages (keeps layout stable)
-    message_container = st.container()
+    # Show messages
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    with message_container:
-        for msg in st.session_state.chat_messages:
-            with st.chat_message(msg["role"]):
-                st.markdown(msg["content"])
-
-    # Chat input is outside the message container and always last
+    # Input at the bottom
     prompt = st.chat_input("Type your message...")
 
     if prompt:
-        # Add user message
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
-
-        # Generate reply
-        with st.spinner("Agent is thinking..."):
-            result = run_llm_agent(prompt)
-            reply = result.get("final_message", "Sorry, I could not process that.")
-
-        # Add assistant reply
+        
+        result = run_llm_agent(prompt)
+        reply = result.get("final_message", "Sorry, I could not process that.")
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
+        
         st.rerun()
         
 with tab_architecture:
