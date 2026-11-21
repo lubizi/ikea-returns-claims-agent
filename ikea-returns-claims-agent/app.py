@@ -72,61 +72,6 @@ with st.sidebar:
     st.warning("No real IKEA system, payment service or customer data is connected.")
 
 
-SCENARIOS = {
-    "Damaged item — eligible": {
-        "order_id": "HK-2026-1001",
-        "email": "alex.chan@example.com",
-        "issue": IssueType.DAMAGED.value,
-        "description": "The tabletop arrived with a deep crack along one corner.",
-        "resolution": "Replacement",
-        "evidence": True,
-        "assembled": False,
-    },
-    "Missing evidence": {
-        "order_id": "HK-2026-1001",
-        "email": "alex.chan@example.com",
-        "issue": IssueType.DAMAGED.value,
-        "description": "The tabletop was damaged on arrival.",
-        "resolution": "Replacement",
-        "evidence": False,
-        "assembled": False,
-    },
-    "High-value return": {
-        "order_id": "HK-2026-1002",
-        "email": "jamie.wong@example.com",
-        "issue": IssueType.RETURN.value,
-        "description": "The sofa does not fit the intended room.",
-        "resolution": "Refund",
-        "evidence": True,
-        "assembled": False,
-    },
-    "Safety escalation": {
-        "order_id": "HK-2026-1003",
-        "email": "sam.lee@example.com",
-        "issue": IssueType.DAMAGED.value,
-        "description": "The lamp produced smoke and an electric shock when switched on.",
-        "resolution": "Refund",
-        "evidence": True,
-        "assembled": True,
-    },
-    "Unknown order": {
-        "order_id": "HK-2026-9999",
-        "email": "customer@example.com",
-        "issue": IssueType.RETURN.value,
-        "description": "I would like to return this item.",
-        "resolution": "Refund",
-        "evidence": False,
-        "assembled": False,
-    },
-}
-
-if st.session_state.get("loaded_scenario") != scenario:
-    defaults = SCENARIOS[scenario]
-    for key, value in defaults.items():
-        st.session_state[key] = value
-    st.session_state["loaded_scenario"] = scenario
-
-
 tab_claim, tab_architecture, tab_roi = st.tabs(
     ["Submit & assess claim", "Agent workflow", "Business value"]
 )
