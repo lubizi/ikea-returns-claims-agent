@@ -148,23 +148,25 @@ with tab_chat:
     st.subheader("Chat with the Returns & Claims Agent")
     st.caption("You can ask follow-up questions. The agent remembers the conversation.")
 
-    # 1. Initialise chat history
+    # Initialise history
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
-    # 2. Display all existing messages FIRST
+    # 1. Show all previous messages FIRST
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # 3. Chat input comes LAST (this keeps it at the bottom)
-    if prompt := st.chat_input("Type your message (e.g. I want a refund for order ORD-1001)"):
-        # Add user message
+    # 2. Chat input MUST be last
+    prompt = st.chat_input("Type your message (e.g. I want a refund for order ORD-1001)")
+
+    if prompt:
+        # Display user message immediately
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
 
-        # Get agent reply
+        # Call agent
         with st.chat_message("assistant"):
             with st.spinner("Agent is thinking..."):
                 result = run_llm_agent(prompt)
@@ -172,14 +174,15 @@ with tab_chat:
                 st.markdown(reply)
 
                 if result.get("tool_trace"):
-                    with st.expander("Tools called"):
+                    with st.expander("Tools called in this turn"):
                         for step in result["tool_trace"]:
                             st.write(f"**{step['tool']}**")
-                            st.json(step["args"])
+                            st.json(step.get("args", {}))
 
         # Save assistant reply
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
-
+        st.rerun()   # refresh so the new messages appear above the input
+        
 with tab_architecture:
     st.subheader("Multi-step business workflow")
     st.graphviz_chart(
