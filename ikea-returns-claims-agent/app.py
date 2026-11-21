@@ -146,8 +146,9 @@ with tab_claim:
 
 with tab_chat:
     st.subheader("Chat with the Returns & Claims Agent")
-    st.caption("You can ask follow-up questions. The agent remembers the conversation.")
+    st.caption("You can ask follow-up questions.")
 
+    # Initialise history
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
@@ -156,26 +157,18 @@ with tab_chat:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Chat input is always last
+    # Chat input is always at the bottom
     prompt = st.chat_input("Type your message...")
 
     if prompt:
-        # Add user message and rerun immediately so it appears above the input
+        # 1. Save and show user message
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        st.rerun()
-
-    # After rerun, if the last message is from the user, generate the reply
-    if (st.session_state.chat_messages 
-        and st.session_state.chat_messages[-1]["role"] == "user"
-        and "thinking" not in st.session_state):
         
-        st.session_state.thinking = True
+        # 2. Generate reply using the existing function
         with st.chat_message("assistant"):
             with st.spinner("Agent is thinking..."):
-                # Call agent with full history (see part 2)
-                history = st.session_state.chat_messages
-                result = run_llm_agent_with_history(history)
-                reply = result.get("final_message", "Sorry, something went wrong.")
+                result = run_llm_agent(prompt)          # ← uses existing function
+                reply = result.get("final_message", "Sorry, I could not process that.")
                 st.markdown(reply)
 
                 if result.get("tool_trace"):
@@ -184,8 +177,8 @@ with tab_chat:
                             st.write(f"**{step['tool']}**")
                             st.json(step.get("args", {}))
 
+        # 3. Save assistant reply
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
-        del st.session_state.thinking
         st.rerun()
         
 with tab_architecture:
