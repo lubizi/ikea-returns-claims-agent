@@ -44,8 +44,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-orders = load_orders()
-
 with st.sidebar:
     st.header("Demo control centre")
     st.caption("Select a scenario to prefill a test case.")
