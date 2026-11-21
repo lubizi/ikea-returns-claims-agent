@@ -148,40 +148,45 @@ with tab_chat:
     st.subheader("Chat with the Returns & Claims Agent")
     st.caption("You can ask follow-up questions. The agent remembers the conversation.")
 
-    # Initialise history
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
-    # 1. Show all previous messages FIRST
+    # Display all messages
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # 2. Chat input MUST be last
-    prompt = st.chat_input("Type your message (e.g. I want a refund for order ORD-1001)")
+    # Chat input is always last
+    prompt = st.chat_input("Type your message...")
 
     if prompt:
-        # Display user message immediately
+        # Add user message and rerun immediately so it appears above the input
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        st.rerun()
 
-        # Call agent
+    # After rerun, if the last message is from the user, generate the reply
+    if (st.session_state.chat_messages 
+        and st.session_state.chat_messages[-1]["role"] == "user"
+        and "thinking" not in st.session_state):
+        
+        st.session_state.thinking = True
         with st.chat_message("assistant"):
             with st.spinner("Agent is thinking..."):
-                result = run_llm_agent(prompt)
-                reply = result.get("final_message", "Sorry, I could not process that.")
+                # Call agent with full history (see part 2)
+                history = st.session_state.chat_messages
+                result = run_llm_agent_with_history(history)
+                reply = result.get("final_message", "Sorry, something went wrong.")
                 st.markdown(reply)
 
                 if result.get("tool_trace"):
-                    with st.expander("Tools called in this turn"):
+                    with st.expander("Tools called"):
                         for step in result["tool_trace"]:
                             st.write(f"**{step['tool']}**")
                             st.json(step.get("args", {}))
 
-        # Save assistant reply
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
-        st.rerun()   # refresh so the new messages appear above the input
+        del st.session_state.thinking
+        st.rerun()
         
 with tab_architecture:
     st.subheader("Multi-step business workflow")
