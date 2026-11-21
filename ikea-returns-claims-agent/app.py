@@ -144,11 +144,6 @@ with tab_claim:
     
         st.caption(f"Status: {result.get('status', 'COMPLETED')}")
 
-        metric1, metric2, metric3 = st.columns(3)
-        metric1.metric("Confidence", f"{result.confidence:.0%}")
-        metric2.metric("Claim value", f"HK${result.estimated_amount_hkd:,.0f}")
-        metric3.metric("Guardrails", len(result.guardrails_triggered))
-
         left, right = st.columns([1, 1])
         with left:
             st.subheader("Assessment explanation")
