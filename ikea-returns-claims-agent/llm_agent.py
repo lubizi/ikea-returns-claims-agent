@@ -352,7 +352,7 @@ Follow this strict multi-step workflow:
     }
 
 # =============================================================================
-# 7. TRUE CONVERSATION MEMORY
+# 6. TRUE CONVERSATION MEMORY
 # =============================================================================
 
 def run_llm_agent_with_history(chat_history: list, max_steps: int = 6) -> dict:
@@ -420,9 +420,6 @@ Policy:
 # 7. QUICK LOCAL TEST (optional)
 # =============================================================================
 if __name__ == "__main__":
-    # Set these before running:
-    # export HKUST_OPENAI_API_KEY="your-key"
-    # export HKUST_OPENAI_BASE_URL="https://hkust.azure-api.net/hkust-genai/v1"
 
     test_ticket = (
         "Hi IKEA, I ordered a LACK side table (Order ORD-1001) a few days ago, "
@@ -432,14 +429,3 @@ if __name__ == "__main__":
     result = run_llm_agent(test_ticket)
     print(json.dumps(result, indent=2))
 
-test_ticket = (
-    "Hi IKEA, I ordered a LACK side table (Order ORD-1001) a few days ago, "
-    "and I just noticed my credit card was charged $29.99 twice! "
-    "Please refund the extra charge."
-)
-
-result = run_llm_agent(test_ticket)
-print(result["final_message"])
-print("\n--- Tool calls ---")
-for step in result["tool_trace"]:
-    print(step["tool"], step["args"])
