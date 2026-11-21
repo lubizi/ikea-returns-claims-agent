@@ -72,8 +72,8 @@ with st.sidebar:
     st.warning("No real IKEA system, payment service or customer data is connected.")
 
 
-tab_claim, tab_architecture, tab_roi = st.tabs(
-    ["Submit & assess claim", "Agent workflow", "Business value"]
+tab_claim, tab_chat, tab_architecture, tab_roi = st.tabs(
+    ["Submit & assess claim", "Chat with Agent", "Agent workflow", "Business value"]
 )
 
 with tab_claim:
@@ -143,6 +143,43 @@ with tab_claim:
             st.info("No tools were called.")
     
         st.caption(f"Status: {result.get('status', 'COMPLETED')}")
+
+with tab_chat:
+    st.subheader("Chat with the Returns & Claims Agent")
+    st.caption("You can ask follow-up questions. The agent remembers the conversation.")
+
+    # Initialise chat history
+    if "chat_messages" not in st.session_state:
+        st.session_state.chat_messages = []
+
+    # Display existing messages
+    for msg in st.session_state.chat_messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+
+    # Chat input
+    if prompt := st.chat_input("Type your message (e.g. I want a refund for order ORD-1001)"):
+        # Show user message
+        st.session_state.chat_messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+        # Call the LLM agent
+        with st.chat_message("assistant"):
+            with st.spinner("Agent is thinking..."):
+                result = run_llm_agent(prompt)
+                reply = result.get("final_message", "Sorry, I could not process that.")
+                st.markdown(reply)
+
+                # Optionally show tools used
+                if result.get("tool_trace"):
+                    with st.expander("Tools called"):
+                        for step in result["tool_trace"]:
+                            st.write(f"**{step['tool']}**")
+                            st.json(step["args"])
+
+        # Save assistant reply
+        st.session_state.chat_messages.append({"role": "assistant", "content": reply})
 
 with tab_architecture:
     st.subheader("Multi-step business workflow")
