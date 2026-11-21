@@ -351,9 +351,73 @@ Follow this strict multi-step workflow:
         "status": "MAX_STEPS",
     }
 
+# =============================================================================
+# 7. TRUE CONVERSATION MEMORY
+# =============================================================================
+
+def run_llm_agent_with_history(chat_history: list, max_steps: int = 6) -> dict:
+    """
+    Run the agent with full conversation history for true multi-turn memory.
+    chat_history: list of {"role": "user" or "assistant", "content": "..."}
+    """
+    from langchain_core.messages import AIMessage
+
+    llm = get_llm()
+    llm_with_tools = llm.bind_tools(TOOLS)
+
+    system_prompt = f"""You are an Autonomous Customer Dispute & Refund Resolution Agent for IKEA.
+Follow this workflow:
+1. If the user has not provided an Order ID and claim reason, ask for them before calling any tools.
+2. Once you have both, call check_payment_gateway, check_shipping_status, and get_customer_risk_profile.
+3. Apply the policy below and decide: execute_refund (if allowed), reject, or escalate_to_human_specialist.
+4. Give a clear, polite final reply.
+
+Policy:
+{IKEA_POLICY}
+"""
+
+    # Build message history
+    messages = [SystemMessage(content=system_prompt)]
+    for msg in chat_history:
+        if msg["role"] == "user":
+            messages.append(HumanMessage(content=msg["content"]))
+        elif msg["role"] == "assistant":
+            messages.append(AIMessage(content=msg["content"]))
+
+    tool_trace = []
+
+    for _ in range(max_steps):
+        ai_msg = llm_with_tools.invoke(messages)
+        messages.append(ai_msg)
+
+        if getattr(ai_msg, "tool_calls", None):
+            for tool_call in ai_msg.tool_calls:
+                fn_name = tool_call["name"]
+                fn_args = tool_call["args"]
+                tool_result = TOOL_MAP[fn_name](**fn_args)
+                tool_trace.append({
+                    "tool": fn_name,
+                    "args": fn_args,
+                    "result": tool_result,
+                })
+                messages.append(
+                    ToolMessage(content=tool_result, tool_call_id=tool_call["id"])
+                )
+        else:
+            return {
+                "final_message": ai_msg.content or "",
+                "tool_trace": tool_trace,
+                "status": "COMPLETED",
+            }
+
+    return {
+        "final_message": "Maximum steps reached. Please try rephrasing or contact support.",
+        "tool_trace": tool_trace,
+        "status": "MAX_STEPS",
+    }
 
 # =============================================================================
-# 6. QUICK LOCAL TEST (optional)
+# 7. QUICK LOCAL TEST (optional)
 # =============================================================================
 if __name__ == "__main__":
     # Set these before running:
