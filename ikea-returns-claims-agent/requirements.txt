@@ -1,3 +1,4 @@
-streamlit>=1.37,<2
-pytest>=7.4,<9
-
+streamlit
+langchain==0.3.27
+langchain-core==0.3.76
+langchain-openai==0.3.33
