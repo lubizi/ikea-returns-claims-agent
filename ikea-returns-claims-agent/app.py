@@ -144,28 +144,6 @@ with tab_claim:
     
         st.caption(f"Status: {result.get('status', 'COMPLETED')}")
 
-        left, right = st.columns([1, 1])
-        with left:
-            st.subheader("Assessment explanation")
-            for reason in result.reasons:
-                st.write(f"✓ {reason}")
-            for item in result.required_information:
-                st.write(f"○ Required: {item}")
-            for trigger in result.guardrails_triggered:
-                st.write(f"⚠ {trigger}")
-        with right:
-            st.subheader("Auditable workflow")
-            for step in result.workflow:
-                with st.expander(f"{step.name} — {step.status}"):
-                    st.write(step.detail)
-
-        st.download_button(
-            "Download case record (JSON)",
-            data=json.dumps(result.to_dict(), indent=2, ensure_ascii=False),
-            file_name=f"{result.case_id}.json",
-            mime="application/json",
-        )
-
 with tab_architecture:
     st.subheader("Multi-step business workflow")
     st.graphviz_chart(
