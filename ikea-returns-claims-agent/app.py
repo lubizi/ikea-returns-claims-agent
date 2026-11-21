@@ -148,36 +148,30 @@ with tab_chat:
     st.subheader("Chat with the Returns & Claims Agent")
     st.caption("You can ask follow-up questions.")
 
-    # Initialise history
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Display all messages
-    for msg in st.session_state.chat_messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
+    # Container for messages (keeps layout stable)
+    message_container = st.container()
 
-    # Chat input is always at the bottom
+    with message_container:
+        for msg in st.session_state.chat_messages:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
+
+    # Chat input is outside the message container and always last
     prompt = st.chat_input("Type your message...")
 
     if prompt:
-        # 1. Save and show user message
+        # Add user message
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        
-        # 2. Generate reply using the existing function
-        with st.chat_message("assistant"):
-            with st.spinner("Agent is thinking..."):
-                result = run_llm_agent(prompt)          # ← uses existing function
-                reply = result.get("final_message", "Sorry, I could not process that.")
-                st.markdown(reply)
 
-                if result.get("tool_trace"):
-                    with st.expander("Tools called"):
-                        for step in result["tool_trace"]:
-                            st.write(f"**{step['tool']}**")
-                            st.json(step.get("args", {}))
+        # Generate reply
+        with st.spinner("Agent is thinking..."):
+            result = run_llm_agent(prompt)
+            reply = result.get("final_message", "Sorry, I could not process that.")
 
-        # 3. Save assistant reply
+        # Add assistant reply
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
         st.rerun()
         
