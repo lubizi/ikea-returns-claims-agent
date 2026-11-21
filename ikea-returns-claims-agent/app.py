@@ -6,7 +6,7 @@ import json
 
 import streamlit as st
 
-from agent import ClaimRequest, Decision, IssueType, evaluate_claim, load_orders
+from llm_agent import run_llm_agent
 
 
 st.set_page_config(
@@ -166,44 +166,40 @@ with tab_claim:
         )
 
     if submitted:
-        if not order_id.strip() or not email.strip():
-            st.error("Please enter both the order number and purchasing email.")
+        if not order_id.strip():
+            st.error("Please enter the order number.")
         else:
-            with st.spinner("Running the six-stage workflow..."):
-                st.session_state["result"] = evaluate_claim(
-                    ClaimRequest(
-                        order_id=order_id,
-                        email=email,
-                        issue_type=issue_type,
-                        description=description,
-                        requested_resolution=requested_resolution,
-                        evidence_provided=evidence_provided,
-                        item_opened_or_assembled=assembled,
-                    )
-                )
+            # Build a natural-language ticket for the LLM agent
+            ticket = f"""
+    Order ID: {order_id}
+    Purchasing email: {email}
+    Issue type: {issue_type}
+    Description: {description}
+    Requested resolution: {requested_resolution}
+    Evidence provided: {evidence_provided}
+    Item opened or assembled: {assembled}
+    """
+            with st.spinner("Agent is gathering data and evaluating the claim..."):
+                st.session_state["result"] = run_llm_agent(ticket)
 
     result = st.session_state.get("result")
     if result:
         st.divider()
-        if result.decision == Decision.AUTO_ELIGIBLE:
-            st.success(result.decision.value)
-        elif result.decision == Decision.REQUEST_INFO:
-            st.warning(result.decision.value)
-        elif result.decision == Decision.HUMAN_REVIEW:
-            st.info(result.decision.value)
+        st.subheader("Agent Response")
+        st.success(result["final_message"])
+    
+        st.subheader("Tools Called by the Agent")
+        if result.get("tool_trace"):
+            for i, step in enumerate(result["tool_trace"], 1):
+                with st.expander(f"{i}. {step['tool']}"):
+                    st.write("Arguments:")
+                    st.json(step["args"])
+                    st.write("Result:")
+                    st.code(step["result"], language="json")
         else:
-            st.error(result.decision.value)
-
-        st.markdown(
-            f"""
-            <div class="result-card">
-              <strong>{result.summary}</strong><br>
-              <span class="small-note">Case {result.case_id}</span>
-              <p><strong>Next action:</strong> {result.next_action}</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            st.info("No tools were called.")
+    
+        st.caption(f"Status: {result.get('status', 'COMPLETED')}")
 
         metric1, metric2, metric3 = st.columns(3)
         metric1.metric("Confidence", f"{result.confidence:.0%}")
