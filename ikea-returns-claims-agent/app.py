@@ -6,7 +6,7 @@ import json
 
 import streamlit as st
 
-from llm_agent import run_llm_agent
+from llm_agent import run_llm_agent, run_llm_agent_with_history
 
 
 st.set_page_config(
@@ -146,12 +146,12 @@ with tab_claim:
 
 with tab_chat:
     st.subheader("Chat with the Returns & Claims Agent")
-    st.caption("You can ask follow-up questions.")
+    st.caption("The agent remembers the conversation.")
 
     if "chat_messages" not in st.session_state:
         st.session_state.chat_messages = []
 
-    # Show messages
+    # Display messages
     for msg in st.session_state.chat_messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
@@ -160,12 +160,15 @@ with tab_chat:
     prompt = st.chat_input("Type your message...")
 
     if prompt:
+        # Add user message
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
-        
-        result = run_llm_agent(prompt)
+
+        # Call agent with full history
+        result = run_llm_agent_with_history(st.session_state.chat_messages)
         reply = result.get("final_message", "Sorry, I could not process that.")
+
+        # Add assistant reply
         st.session_state.chat_messages.append({"role": "assistant", "content": reply})
-        
         st.rerun()
         
 with tab_architecture:
