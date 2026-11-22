@@ -18,9 +18,9 @@ IKEA_POLICY = """
 IKEA Official Return & Dispute Policy (classroom simulation):
 
 1. Return Window:
-   - Unopened items: 365 days
-   - Opened items: 180 days
-   - Transit damage or "Item Not Received" claims must be reported within 30 days of delivery.
+   - Unopened items: 30 days
+   - Opened items: 14 days
+   - Transit damage or "Item Not Received" claims must be reported within 14 days of delivery.
 
 2. Duplicate Charges:
    - If payment logs confirm two identical settled charges for the same order,
